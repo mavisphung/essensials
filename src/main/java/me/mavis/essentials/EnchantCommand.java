@@ -125,7 +125,7 @@ public class EnchantCommand implements CommandExecutor {
                         + ChatColor.RED + args[0]);
                 break;
         }
-        return false;
+        return true;
     }
 
     private Enchantment getEnchantmentAt(Map<Enchantment, Integer> enchants, int index) {
