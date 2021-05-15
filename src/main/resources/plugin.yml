@@ -1,0 +1,11 @@
+name: CustomEnchant
+version: ${project.version}
+main: me.mavis.essentials.Essentials
+api-version: 1.16
+authors: [ Mavis ]
+description: A small customized enchantment command
+commands:
+  cuonghoa:
+    aliases: [it, ch]
+    description: Dùng để enchant các vượt ngưỡng trong game
+    usage: /it [en|lore] [add|remove|unbreakable] [enchantment] [level]

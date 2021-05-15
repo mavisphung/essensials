@@ -1,0 +1,9 @@
+senderError: 'Bạn phải là người chơi thì mới sử dụng được câu lệnh này'
+syntaxError:
+  notEnoughArguments: 'Không đủ tham số'
+  notSupportYet: 'Chúng tôi chưa hỗ trợ '
+  notHaveThatEnchantment: 'Không có loại enchantment này'
+
+invalidArgument:
+  numberArgument: 'Tham số này phải là 1 con số'
+  outOfRange: 'Vui lòng nhập từ 0 đến 32767'
