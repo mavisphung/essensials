@@ -113,6 +113,7 @@ public class EnchantCommand implements CommandExecutor {
                         }
                         Map<Enchantment, Integer> enchants = meta.getEnchants();
                         Enchantment found = getEnchantmentAt(enchants, index);
+                        enchants.remove(found);
                         break;
                     }
                     default:
