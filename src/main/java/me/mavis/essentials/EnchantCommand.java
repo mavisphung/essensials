@@ -43,17 +43,17 @@ public class EnchantCommand implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!(sender instanceof Player)) {
             plugin.getServer().getConsoleSender().sendMessage(ChatColor.RED + config.getString(Details.senderError));
-            return false;
+            return true;
         }
         Player player = (Player) sender;
         if (args.length < 1 || args == null) {
             player.sendMessage(ChatColor.GOLD + config.getString(Details.notEnoughAgruments));
-            return false;
+            return true;
         }
         ItemStack itemOnHand = player.getInventory().getItemInMainHand();
         if (itemOnHand == null || itemOnHand.getType().equals(Material.AIR)) {
             player.sendMessage(ChatColor.RED + "Bạn phải cầm một món nào đó trên tay!");
-            return false;
+            return true;
         }
         ItemMeta meta = itemOnHand.getItemMeta();
         switch (args[0]) {
@@ -63,16 +63,18 @@ public class EnchantCommand implements CommandExecutor {
                 break;
             //cuonghoa en [add | remove] <tên enchantment> <level>
             //cuonghoa en add unbreakable
-            case "en":
+            case "en": {
                 if (args.length != 4) {
                     if (args.length == 3) {
+                        //it en add unbreakble
                         if (args[2].toLowerCase().equals("unbreakable")) {
                             meta.setUnbreakable(true);
+                            player.sendMessage("Đã thêm thuộc tính không thể vỡ");
                         }
                     } else {
                         player.sendMessage(ChatColor.RED + config.getString(Details.notEnoughAgruments));
                     }
-                    return false;
+                    return true;
                 }
                 String option = args[1].toLowerCase();
                 switch (option) {
@@ -87,7 +89,7 @@ public class EnchantCommand implements CommandExecutor {
                         int level;
                         try {
                             level = Integer.parseInt(args[3]);
-                            if (level < 0) {
+                            if (level < 0 || level > 32767) {
                                 throw new Exception("less than 0");
                             }
                         } catch (Exception e) {
@@ -95,7 +97,7 @@ public class EnchantCommand implements CommandExecutor {
                                 player.sendMessage(ChatColor.RED + config.getString(Details.outOfRange));
                             else
                                 player.sendMessage(ChatColor.RED + config.getString(Details.numberArgument));
-                            return false;
+                            return true;
                         }
 
                         meta.addEnchant(input, level, true);
@@ -109,10 +111,12 @@ public class EnchantCommand implements CommandExecutor {
                         int index = tryParseUInt(lastArg);
                         if (index < 0 || index > meta.getEnchants().size()) {
                             player.sendMessage(ChatColor.RED + "Vui lòng nhập từ 0 đến " + (meta.getEnchants().size() - 1));
-                            return false;
+                            return true;
                         }
                         Map<Enchantment, Integer> enchants = meta.getEnchants();
                         Enchantment found = getEnchantmentAt(enchants, index);
+                        player.sendMessage(found.toString());
+                        enchants.remove(found);
                         meta.removeEnchant(found);
                         itemOnHand.setItemMeta(meta);
                         break;
@@ -122,6 +126,7 @@ public class EnchantCommand implements CommandExecutor {
                         break;
                 }
                 break;
+            }
             default:
                 player.sendMessage(ChatColor.GOLD + config.getString(Details.notSupportYet) + "câu lệnh "
                         + ChatColor.RED + args[0]);
@@ -130,6 +135,9 @@ public class EnchantCommand implements CommandExecutor {
         return true;
     }
 
+    private void removeEnchantment() {
+
+    }
     private Enchantment getEnchantmentAt(Map<Enchantment, Integer> enchants, int index) {
         Iterator<Enchantment> it = enchants.keySet().iterator();
         int i = 0;
