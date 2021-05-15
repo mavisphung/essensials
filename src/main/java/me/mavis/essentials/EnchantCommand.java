@@ -111,7 +111,8 @@ public class EnchantCommand implements CommandExecutor {
                             player.sendMessage(ChatColor.RED + "Vui lòng nhập từ 0 đến " + (meta.getEnchants().size() - 1));
                             return false;
                         }
-
+                        Map<Enchantment, Integer> enchants = meta.getEnchants();
+                        Enchantment found = getEnchantmentAt(enchants, index);
                         break;
                     }
                     default:
@@ -129,8 +130,13 @@ public class EnchantCommand implements CommandExecutor {
 
     private Enchantment getEnchantmentAt(Map<Enchantment, Integer> enchants, int index) {
         Iterator<Enchantment> it = enchants.keySet().iterator();
+        int i = 0;
         while (it.hasNext()) {
-
+            Enchantment found = it.next();
+            if (i == index) {
+                return found;
+            }
+            i++;
         }
         return null;
     }

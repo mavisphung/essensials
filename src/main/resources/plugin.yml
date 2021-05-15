@@ -8,4 +8,4 @@ commands:
   cuonghoa:
     aliases: [it, ch]
     description: Dùng để enchant các vượt ngưỡng trong game
-    usage: /it [en|lore] [add|remove|unbreakable] [enchantment] [level]
+    usage: '/it [en | lore] [add | remove | unbreakable] [enchantment] [level]'
