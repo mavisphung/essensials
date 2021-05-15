@@ -91,7 +91,7 @@ public class EnchantCommand implements CommandExecutor {
                             int level;
                             try {
                                 level = Integer.parseInt(args[3]);
-                                if (level < 0 || level > 32767) {
+                                if (level <= 0 || level > 32767) {
                                     throw new Exception("less than 0");
                                 }
                             } catch (Exception e) {
@@ -149,10 +149,13 @@ public class EnchantCommand implements CommandExecutor {
     private void removeEnchantment(Player player, ItemStack item, int index) {
         Enchantment found = getEnchantmentAt(item.getEnchantments(), index);
         if (found != null) {
-            item.getItemMeta().getEnchants().remove(found);
-            player.sendMessage("Đã xóa " + found.getKey().getNamespace() + " ra khỏi món đồ");
+            //item.getItemMeta().getEnchants().remove(found); //null pointer
+            ItemMeta mitem = item.getItemMeta();
+            mitem.removeEnchant(found);
+            item.setItemMeta(mitem);
+            player.sendMessage("Đã xóa " + found.getName() + " ra khỏi món đồ");
         } else {
-            player.sendMessage("Phát sinh lỗi xóa enchantment");
+            player.sendMessage(ChatColor.GOLD + "Nhập 0.." + item.getEnchantments().size() + " để xóa enchant");
         }
     }
     private Enchantment getEnchantmentAt(Map<Enchantment, Integer> enchants, int index) {
