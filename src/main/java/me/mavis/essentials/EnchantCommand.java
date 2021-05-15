@@ -48,7 +48,7 @@ public class EnchantCommand implements CommandExecutor {
         Player player = (Player) sender;
         if (args.length < 1 || args == null) {
             player.sendMessage(ChatColor.GOLD + config.getString(Details.notEnoughAgruments));
-            return true;
+            return false;
         }
         ItemStack itemOnHand = player.getInventory().getItemInMainHand();
         if (itemOnHand == null || itemOnHand.getType().equals(Material.AIR)) {
@@ -64,45 +64,60 @@ public class EnchantCommand implements CommandExecutor {
             //cuonghoa en [add | remove] <tên enchantment> <level>
             //cuonghoa en add unbreakable
             case "en": {
-                if (args.length != 4) {
-                    if (args.length == 3) {
-                        //it en add unbreakble
-                        if (args[2].toLowerCase().equals("unbreakable")) {
-                            meta.setUnbreakable(true);
-                            player.sendMessage("Đã thêm thuộc tính không thể vỡ");
-                        }
-                    } else {
-                        player.sendMessage(ChatColor.RED + config.getString(Details.notEnoughAgruments));
-                    }
-                    return true;
-                }
+//                if (args.length != 4) {
+//                    if (args.length == 3) {
+//                        //it en add unbreakble
+//                        if (args[2].toLowerCase().equals("unbreakable")) {
+//                            meta.setUnbreakable(true);
+//                            player.sendMessage("Đã thêm thuộc tính không thể vỡ");
+//                            return true;
+//                        }
+//                    } else {
+//                        player.sendMessage(ChatColor.RED + config.getString(Details.notEnoughAgruments));
+//                        return false;
+//                    }
+//                }
                 String option = args[1].toLowerCase();
                 switch (option) {
-                    //cuonghoa en add <enchantment> <level>
                     case "add": {
 //                        Map<Enchantment, Integer> enchantList = itemOnHand.getEnchantments();
-                        Enchantment input = Enchantment.getByKey(NamespacedKey.minecraft(args[2].toLowerCase()));
-                        if (input == null) {
-                            player.sendMessage(ChatColor.RED + config.getString(Details.notHaveThatEnchantment));
+                        if (args.length == 4) {
+                            //cuonghoa en add <enchantment> <level>
+                            Enchantment input = Enchantment.getByKey(NamespacedKey.minecraft(args[2].toLowerCase()));
+                            if (input == null) {
+                                player.sendMessage(ChatColor.RED + config.getString(Details.notHaveThatEnchantment));
+                                return false;
+                            }
+                            int level;
+                            try {
+                                level = Integer.parseInt(args[3]);
+                                if (level < 0 || level > 32767) {
+                                    throw new Exception("less than 0");
+                                }
+                            } catch (Exception e) {
+                                if (e.getMessage().equals("less than 0"))
+                                    player.sendMessage(ChatColor.RED + config.getString(Details.outOfRange));
+                                else
+                                    player.sendMessage(ChatColor.RED + config.getString(Details.numberArgument));
+                                return false;
+                            }
+                            meta.addEnchant(input, level, true);
+                            itemOnHand.setItemMeta(meta);
+                            player.sendMessage(ChatColor.AQUA + "Đã thêm " + ChatColor.GOLD + input.getKey() + " cấp " + level);
+                        } else if (args.length == 3) {
+                            //it en add unbreakable
+                            if (args[2].toLowerCase().equals("unbreakable")) {
+                                meta.setUnbreakable(true);
+                                itemOnHand.setItemMeta(meta);
+                                player.sendMessage(ChatColor.AQUA + "Đã thêm thuộc tính không thể vỡ");
+                            } else {
+                                player.sendMessage(ChatColor.RED + config.getString(Details.notHaveThatEnchantment));
+                                return false;
+                            }
+                        } else {
+                            player.sendMessage("Có gì đó sai sai");
                             return false;
                         }
-                        int level;
-                        try {
-                            level = Integer.parseInt(args[3]);
-                            if (level < 0 || level > 32767) {
-                                throw new Exception("less than 0");
-                            }
-                        } catch (Exception e) {
-                            if (e.getMessage().equals("less than 0"))
-                                player.sendMessage(ChatColor.RED + config.getString(Details.outOfRange));
-                            else
-                                player.sendMessage(ChatColor.RED + config.getString(Details.numberArgument));
-                            return true;
-                        }
-
-                        meta.addEnchant(input, level, true);
-                        itemOnHand.setItemMeta(meta);
-                        player.sendMessage(ChatColor.AQUA + "Đã thêm " + ChatColor.GOLD + input.getKey() + " cấp " + level);
                         break;
                     }
                     //cuonghoa en remove <index>
@@ -114,11 +129,7 @@ public class EnchantCommand implements CommandExecutor {
                             return true;
                         }
                         Map<Enchantment, Integer> enchants = meta.getEnchants();
-                        Enchantment found = getEnchantmentAt(enchants, index);
-                        player.sendMessage(found.toString());
-                        enchants.remove(found);
-                        meta.removeEnchant(found);
-                        itemOnHand.setItemMeta(meta);
+                        removeEnchantment(player, itemOnHand, index);
                         break;
                     }
                     default:
@@ -135,8 +146,14 @@ public class EnchantCommand implements CommandExecutor {
         return true;
     }
 
-    private void removeEnchantment() {
-
+    private void removeEnchantment(Player player, ItemStack item, int index) {
+        Enchantment found = getEnchantmentAt(item.getEnchantments(), index);
+        if (found != null) {
+            item.getItemMeta().getEnchants().remove(found);
+            player.sendMessage("Đã xóa " + found.getKey().getNamespace() + " ra khỏi món đồ");
+        } else {
+            player.sendMessage("Phát sinh lỗi xóa enchantment");
+        }
     }
     private Enchantment getEnchantmentAt(Map<Enchantment, Integer> enchants, int index) {
         Iterator<Enchantment> it = enchants.keySet().iterator();
