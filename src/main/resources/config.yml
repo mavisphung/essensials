@@ -10,3 +10,4 @@ invalidArgument:
 
 usage:
   remove: '/[it | ch | cuonghoa] en remove <index>'
+  name: '/[it | ch | cuonghoa] name <your name>'

@@ -9,7 +9,7 @@ public final class Essentials extends JavaPlugin {
     public void onEnable() {
         // Plugin startup logic
         //lấy file config mặc định
-        getConfig().options().copyDefaults();
+        getConfig().options().copyDefaults(true);
         saveConfig();
 
         getCommand("cuonghoa").setExecutor(new EnchantCommand(this));

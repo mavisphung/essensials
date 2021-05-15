@@ -1,5 +1,6 @@
 package me.mavis.essentials;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -13,9 +14,8 @@ import org.bukkit.inventory.EnchantingInventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import javax.swing.*;
+import java.util.*;
 
 public class EnchantCommand implements CommandExecutor {
 
@@ -46,7 +46,7 @@ public class EnchantCommand implements CommandExecutor {
             return true;
         }
         Player player = (Player) sender;
-        if (args.length < 1 || args == null) {
+        if (args.length <= 1 || args == null) {
             player.sendMessage(ChatColor.GOLD + config.getString(Details.notEnoughAgruments));
             return false;
         }
@@ -58,9 +58,25 @@ public class EnchantCommand implements CommandExecutor {
         ItemMeta meta = itemOnHand.getItemMeta();
         switch (args[0]) {
             //cuonghoa lore add <tên lore>
-            case "lore":
-                player.sendMessage("Hiện tại chưa hỗ trợ chức năng này");
+            //cuonghoa lore remove <index>
+            case "lore": {
+                String option = args[1].toLowerCase();
+                switch (option) {
+                    case "add": {
+                        addLore(itemOnHand, args);
+                        break;
+                    }
+                    case "remove": {
+                        removeLore(player, itemOnHand, args);
+                        break;
+                    }
+                    default:
+                        player.sendMessage("Hiện tại chưa hỗ trợ chức năng này");
+                        break;
+                }
+
                 break;
+            }
             //cuonghoa en [add | remove] <tên enchantment> <level>
             //cuonghoa en add unbreakable
             case "en": {
@@ -135,12 +151,91 @@ public class EnchantCommand implements CommandExecutor {
                 }
                 break;
             }
+            //it name <tên>
+            case "name": {
+                changeName(player, itemOnHand, args);
+                break;
+            }
             default:
                 player.sendMessage(ChatColor.GOLD + config.getString(Details.notSupportYet) + "câu lệnh "
                         + ChatColor.RED + args[0]);
                 break;
         }
         return true;
+    }
+
+    private int parseIntInRange(int min, int max, String number) {
+        int result = -1;
+        try {
+            result = Integer.parseInt(number);
+            if (result < min || result > max)
+                throw new Exception("outofrange");
+        } catch (Exception e) {
+            Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "Must in " + min + ".." + max);
+            result = -1;
+        }
+        return result;
+    }
+
+    private void changeName(Player player, ItemStack item, String[] args) {
+        StringBuilder builder = new StringBuilder("");
+        //it name abc itse
+        //    0    1    2
+        for (int i = 1; i < args.length; i++) {
+            builder.append(args[i] + " ");
+        }
+        String name =
+                ChatColor.translateAlternateColorCodes('&', builder.toString().trim());
+        ItemMeta meta = item.getItemMeta();
+        meta.setDisplayName(name);
+        item.setItemMeta(meta);
+        player.sendMessage("Đã đổi tên thành " + name);
+    }
+
+    private void removeLore(Player player, ItemStack item, String[] args) {
+        //it lore remove <index>
+        //    0     1       2
+        ItemMeta meta = item.getItemMeta();
+        List<String> lores = meta.getLore();
+        if (lores == null) {
+            player.sendMessage(ChatColor.RED + "Món đồ hiện tại chưa có dòng lore nào!");
+            return;
+        }
+        if (args.length == 2) { //nếu không có tham số index
+            //xóa dòng lore cuối cùng
+            int last = lores.size() - 1;
+            lores.remove(last);
+        } else {
+            //xóa dòng lore ở vị trí bất kỳ
+            int index = parseIntInRange(0, lores.size() - 1, args[2]);
+            if (index == -1) { //thoát hàm nếu có gì đó sai sót
+                player.sendMessage(ChatColor.RED + "Phải nằm trong khoảng 0.." + (lores.size() - 1));
+                return;
+            }
+            lores.remove(index);
+        }
+        meta.setLore(lores);
+        item.setItemMeta(meta);
+    }
+
+    private void addLore(ItemStack item, String[] args) {
+        StringBuilder strBuilder = new StringBuilder("");
+        //it lore add grewg wegweeg weg we gw g weg w egw egweg wegweg
+        //    0    1    2     3      4   5 6  7  8  9  10  11    12
+        for(int i = 2; i < args.length; i++) {
+            strBuilder.append(args[i] + " ");
+        }
+//        String lore = strBuilder.toString().trim(); //cắt dấu cách phía sau
+        String lore =
+                ChatColor.translateAlternateColorCodes('&', strBuilder.toString().trim());
+        ItemMeta meta = item.getItemMeta();
+        List<String> lores = meta.getLore();
+        if (lores == null) {
+            lores = new ArrayList<>();
+        }
+        lores.add(lore);
+        meta.setLore(lores);
+        item.setItemMeta(meta); //cập nhật lại
     }
 
     private void removeEnchantment(Player player, ItemStack item, int index) {
