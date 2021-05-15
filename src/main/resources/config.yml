@@ -7,3 +7,6 @@ syntaxError:
 invalidArgument:
   numberArgument: 'Tham số này phải là 1 con số'
   outOfRange: 'Vui lòng nhập từ 0 đến 32767'
+
+usage:
+  remove: '/[it | ch | cuonghoa] en remove <index>'

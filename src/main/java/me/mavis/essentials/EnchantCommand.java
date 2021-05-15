@@ -64,19 +64,6 @@ public class EnchantCommand implements CommandExecutor {
             //cuonghoa en [add | remove] <tên enchantment> <level>
             //cuonghoa en add unbreakable
             case "en": {
-//                if (args.length != 4) {
-//                    if (args.length == 3) {
-//                        //it en add unbreakble
-//                        if (args[2].toLowerCase().equals("unbreakable")) {
-//                            meta.setUnbreakable(true);
-//                            player.sendMessage("Đã thêm thuộc tính không thể vỡ");
-//                            return true;
-//                        }
-//                    } else {
-//                        player.sendMessage(ChatColor.RED + config.getString(Details.notEnoughAgruments));
-//                        return false;
-//                    }
-//                }
                 String option = args[1].toLowerCase();
                 switch (option) {
                     case "add": {
@@ -122,14 +109,24 @@ public class EnchantCommand implements CommandExecutor {
                     }
                     //cuonghoa en remove <index>
                     case "remove": {
-                        String lastArg = args[2];
-                        int index = tryParseUInt(lastArg);
-                        if (index < 0 || index > meta.getEnchants().size()) {
-                            player.sendMessage(ChatColor.RED + "Vui lòng nhập từ 0 đến " + (meta.getEnchants().size() - 1));
-                            return true;
+                        if (args.length == 3) {
+                            String lastArg = args[2];
+                            if (lastArg.toLowerCase().equals("unbreakable")) {
+                                meta.setUnbreakable(false);
+                                itemOnHand.setItemMeta(meta);
+                                player.sendMessage(ChatColor.AQUA + "Đã xóa thuộc tính không thể phá vỡ");
+                            } else {
+                                int index = tryParseUInt(lastArg);
+                                if (index < 0 || index > meta.getEnchants().size()) {
+                                    player.sendMessage(ChatColor.RED + "Vui lòng nhập từ 0 đến " + (meta.getEnchants().size() - 1));
+                                    return true;
+                                }
+                                Map<Enchantment, Integer> enchants = meta.getEnchants();
+                                removeEnchantment(player, itemOnHand, index);
+                            }
+                        } else {
+                            player.sendMessage(ChatColor.RED + config.getString(Details.remove));
                         }
-                        Map<Enchantment, Integer> enchants = meta.getEnchants();
-                        removeEnchantment(player, itemOnHand, index);
                         break;
                     }
                     default:

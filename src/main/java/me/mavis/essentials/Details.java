@@ -8,4 +8,5 @@ public class Details {
     public static final String notHaveThatEnchantment = "syntaxError.notHaveThatEnchantment";
     public static final String numberArgument = "invalidArgument.numberArgument";
     public static final String outOfRange = "invalidArgument.outOfRange";
+    public static final String remove = "usage.remove";
 }
