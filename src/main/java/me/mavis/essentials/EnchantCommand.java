@@ -172,14 +172,16 @@ public class EnchantCommand implements CommandExecutor {
     private void addEffect(Player player, ItemStack item, String[] args) {
         //it pot <tên effect> <level> <thời gian>
         if (!item.getType().equals(Material.POTION)
-            || !item.getType().equals(Material.SPLASH_POTION)
-            || !item.getType().equals(Material.LINGERING_POTION)) {
+            && !item.getType().equals(Material.SPLASH_POTION)
+            && !item.getType().equals(Material.LINGERING_POTION)) {
             player.sendMessage(ChatColor.RED + "Bạn phải cầm chai thuốc trên tay thì mới thêm effect được");
+            player.sendMessage(item.getType().toString());
             return;
         }
         PotionMeta pMeta = (PotionMeta) item.getItemMeta();
         pMeta.setColor(Color.BLACK);
-        pMeta.addCustomEffect(new PotionEffect(PotionEffectType.SPEED, 20 * 120, 2), true);
+        pMeta.addCustomEffect(new PotionEffect(PotionEffectType.SPEED, 20 * 300, 6), true);
+        pMeta.addCustomEffect(new PotionEffect(PotionEffectType.JUMP, 20 * 300, 6), true);
         pMeta.setDisplayName(ChatColor.GOLD + "The Flash");
         List<String> lores = new ArrayList<>();
         lores.add(ChatColor.AQUA + "Thuốc giúp bạn trở thành the flash");
