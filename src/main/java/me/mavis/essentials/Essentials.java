@@ -12,7 +12,7 @@ public final class Essentials extends JavaPlugin {
         getConfig().options().copyDefaults(true);
         saveConfig();
 
-        getCommand("cuonghoa").setExecutor(new EnchantCommand(this));
+        getCommand("it").setExecutor(new EnchantCommand(this));
 
         getServer().getConsoleSender().sendMessage(ChatColor.GOLD + "Enchantment Command is ready!");
 

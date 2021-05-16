@@ -1,9 +1,6 @@
 package me.mavis.essentials;
 
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
+import org.bukkit.*;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -13,6 +10,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.EnchantingInventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import javax.swing.*;
 import java.util.*;
@@ -57,8 +57,8 @@ public class EnchantCommand implements CommandExecutor {
         }
         ItemMeta meta = itemOnHand.getItemMeta();
         switch (args[0]) {
-            //cuonghoa lore add <tên lore>
-            //cuonghoa lore remove <index>
+            //it lore add <tên lore>
+            //it lore remove <index>
             case "lore": {
                 String option = args[1].toLowerCase();
                 switch (option) {
@@ -77,15 +77,15 @@ public class EnchantCommand implements CommandExecutor {
 
                 break;
             }
-            //cuonghoa en [add | remove] <tên enchantment> <level>
-            //cuonghoa en add unbreakable
+            //it en [add | remove] <tên enchantment> <level>
+            //it en add unbreakable
             case "en": {
                 String option = args[1].toLowerCase();
                 switch (option) {
                     case "add": {
 //                        Map<Enchantment, Integer> enchantList = itemOnHand.getEnchantments();
                         if (args.length == 4) {
-                            //cuonghoa en add <enchantment> <level>
+                            //it en add <enchantment> <level>
                             Enchantment input = Enchantment.getByKey(NamespacedKey.minecraft(args[2].toLowerCase()));
                             if (input == null) {
                                 player.sendMessage(ChatColor.RED + config.getString(Details.notHaveThatEnchantment));
@@ -123,7 +123,7 @@ public class EnchantCommand implements CommandExecutor {
                         }
                         break;
                     }
-                    //cuonghoa en remove <index>
+                    //it en remove <index>
                     case "remove": {
                         if (args.length == 3) {
                             String lastArg = args[2];
@@ -156,12 +156,35 @@ public class EnchantCommand implements CommandExecutor {
                 changeName(player, itemOnHand, args);
                 break;
             }
+            //it pot <tên effect> <level> <thời gian>
+            case "pot": {
+                addEffect(player, itemOnHand, args);
+                break;
+            }
             default:
                 player.sendMessage(ChatColor.GOLD + config.getString(Details.notSupportYet) + "câu lệnh "
                         + ChatColor.RED + args[0]);
                 break;
         }
         return true;
+    }
+
+    private void addEffect(Player player, ItemStack item, String[] args) {
+        //it pot <tên effect> <level> <thời gian>
+        if (!item.getType().equals(Material.POTION)
+            || !item.getType().equals(Material.SPLASH_POTION)
+            || !item.getType().equals(Material.LINGERING_POTION)) {
+            player.sendMessage(ChatColor.RED + "Bạn phải cầm chai thuốc trên tay thì mới thêm effect được");
+            return;
+        }
+        PotionMeta pMeta = (PotionMeta) item.getItemMeta();
+        pMeta.setColor(Color.BLACK);
+        pMeta.addCustomEffect(new PotionEffect(PotionEffectType.SPEED, 20 * 120, 2), true);
+        pMeta.setDisplayName(ChatColor.GOLD + "The Flash");
+        List<String> lores = new ArrayList<>();
+        lores.add(ChatColor.AQUA + "Thuốc giúp bạn trở thành the flash");
+        pMeta.setLore(lores);
+        item.setItemMeta(pMeta);
     }
 
     private int parseIntInRange(int min, int max, String number) {
